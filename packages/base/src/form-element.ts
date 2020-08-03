@@ -46,9 +46,15 @@ export abstract class FormElement extends BaseElement {
    */
   readonly ripple?: RippleInterface|Promise<RippleInterface|null>;
 
-  click() {
+  focus() {
     if (this.formElement) {
       this.formElement.focus();
+    }
+  }
+
+  click() {
+    if (this.formElement) {
+      this.focus();
       this.formElement.click();
     }
   }
