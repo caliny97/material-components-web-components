@@ -1,0 +1,216 @@
+/**
+@license
+Copyright 2020 Google Inc. All Rights Reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+@use 'sass:map';
+@use 'sass:selector';
+@use '@material/elevation/elevation-theme';
+@use '@material/theme/theme';
+@use '@material/theme/theme-color';
+@use '@material/theme/shadow-dom';
+@use '@material/button/variables' as button-variables;
+@use '@material/mwc-ripple/src/ripple-theme';
+
+$_primary: theme-color.prop-value(primary);
+
+$_on-primary: theme-color.prop-value(on-primary);
+
+$_primary-opacities: (
+  hover: 0.04,
+  focus: 0.12,
+  press: 0.1
+);
+
+$_on-primary-opacities: (
+  hover: 0.08,
+  focus: 0.24,
+  press: 0.24
+);
+
+// TODO(b/153370936): replace with theme.resolve()
+$light-theme: (
+  text: (
+    horizontal-padding: button-variables.$horizontal-padding,
+    ink-color: $_primary,
+    ink-color-disabled: button-variables.$disabled-ink-color,
+    ripple: (
+      state: $_primary,
+      opacity: $_primary-opacities
+    ),
+  ),
+  outlined: (
+    border-width: button-variables.$outlined-border-width,
+    horizontal-padding: button-variables.$contained-horizontal-padding,
+    ink-color: $_primary,
+    ink-color-disabled: button-variables.$disabled-ink-color,
+    outline-color: button-variables.$outline-color,
+    outline-color-disabled: button-variables.$disabled-container-color,
+    ripple: (
+      state: $_primary,
+      opacity: $_primary-opacities
+    ),
+  ),
+  contained: (
+    container-color: $_primary,
+    container-color-disabled: button-variables.$disabled-container-color,
+    elevation-shadow: elevation-theme.elevation-box-shadow(2),
+    elevation-shadow-active: elevation-theme.elevation-box-shadow(8),
+    elevation-shadow-disabled: elevation-theme.elevation-box-shadow(0),
+    elevation-shadow-hover: elevation-theme.elevation-box-shadow(4),
+    horizontal-padding: button-variables.$contained-horizontal-padding,
+    ink-color: $_on-primary,
+    ink-color-disabled: button-variables.$disabled-ink-color,
+    ripple: (
+      state: $_on-primary,
+      opacity: $_on-primary-opacities
+    ),
+  ),
+);
+
+@mixin theme($theme: $light-theme) {
+  // text buttons
+  $padding: theme.deep-get($theme, text horizontal-padding);
+  @if $padding {
+    --mdc-button-horizontal-padding: #{$padding};
+  }
+  $color: theme.deep-get($theme, text ink-color);
+  @if $color {
+    --mdc-theme-primary: #{$color};
+  }
+  $color-disabled: theme.deep-get($theme, text ink-color-disabled);
+  @if $color-disabled {
+    --mdc-button-disabled-ink-color: #{$color-disabled};
+  }
+  $ripple-config: theme.deep-get($theme, text ripple);
+  @if $ripple-config {
+    @include ripple-theme.theme($ripple-config);
+  }
+  // outlined buttons
+  @include shadow-dom.host-aware(selector.append(&, '[outlined]')) {
+    $border: theme.deep-get($theme, outlined border-width);
+    @if $border {
+      --mdc-button-outline-width: #{$border};
+    }
+    $padding: theme.deep-get($theme, outlined horizontal-padding);
+    @if $padding {
+      --mdc-button-horizontal-padding: #{$padding};
+    }
+    $color: theme.deep-get($theme, outlined ink-color);
+    @if $color {
+      --mdc-theme-primary: #{$color};
+    }
+    $color-disabled: theme.deep-get($theme, outlined ink-color-disabled);
+    @if $color-disabled {
+      --mdc-button-disabled-ink-color: #{$color-disabled};
+    }
+    $outline-color: theme.deep-get($theme, outlined outline-color);
+    @if $outline-color {
+      --mdc-button-outline-color: #{$outline-color};
+    }
+    $outline-color-disabled: theme.deep-get(
+      $theme,
+      outlined outline-color-disabled
+    );
+    @if $outline-color-disabled {
+      --mdc-button-disabled-outline-color: #{$outline-color-disabled};
+    }
+    $ripple-config: theme.deep-get($theme, outlined ripple);
+    @if $ripple-config {
+      @include ripple-theme.theme($ripple-config);
+    }
+  }
+
+  // raised buttons
+  @include shadow-dom.host-aware(selector.append(&, '[raised]')) {
+    $container-color: theme.deep-get($theme, contained container-color);
+    @if $container-color {
+      --mdc-theme-primary: #{$container-color};
+    }
+    $container-color-disabled: theme.deep-get(
+      $theme,
+      contained container-color-disabled
+    );
+    @if $container-color-disabled {
+      --mdc-button-disabled-fill-color: #{$container-color-disabled};
+    }
+    $shadow: theme.deep-get($theme, contained, elevation-shadow);
+    @if $shadow {
+      --mdc-button-raised-box-shadow: #{$shadow};
+    }
+    $shadow-active: theme.deep-get($theme, contained elevation-shadow-active);
+    @if $shadow-active {
+      --mdc-button-raised-box-shadow-active: #{$shadow-active};
+    }
+    $shadow-disabled: theme.deep-get(
+      $theme,
+      contained elevation-shadow-disabled
+    );
+    @if $shadow-disabled {
+      --mdc-button-raised-box-shadow-disabled: #{$shadow-disabled};
+    }
+    $shadow-hover: theme.deep-get($theme, contained elevation-shadow-hover);
+    @if $shadow-hover {
+      --mdc-button-raised-box-shadow-hover: #{$shadow-hover};
+    }
+    $padding: theme.deep-get($theme, contained horizontal-padding);
+    @if $padding {
+      --mdc-button-horizontal-padding: #{$padding};
+    }
+    $color: theme.deep-get($theme, contained ink-color);
+    @if $color {
+      --mdc-theme-on-primary: #{$color};
+    }
+    $color-disabled: theme.deep-get($theme, contained ink-color-disabled);
+    @if $color-disabled {
+      --mdc-button-disabled-ink-color: #{$color-disabled};
+    }
+    $ripple-config: theme.deep-get($theme, contained ripple);
+    @if $ripple-config {
+      @include ripple-theme.theme($ripple-config);
+    }
+  }
+
+  // unelevated buttons
+  @include shadow-dom.host-aware(selector.append(&, '[unelevated]')) {
+    $container-color: theme.deep-get($theme, contained container-color);
+    @if $container-color {
+      --mdc-theme-primary: #{$container-color};
+    }
+    $container-color-disabled: theme.deep-get(
+      $theme,
+      contained container-color-disabled
+    );
+    @if $container-color-disabled {
+      --mdc-button-disabled-fill-color: #{$container-color-disabled};
+    }
+    $padding: theme.deep-get($theme, contained horizontal-padding);
+    @if $padding {
+      --mdc-button-horizontal-padding: #{$padding};
+    }
+    $color: theme.deep-get($theme, contained ink-color);
+    @if $color {
+      --mdc-theme-on-primary: #{$color};
+    }
+    $color-disabled: theme.deep-get($theme, contained ink-color-disabled);
+    @if $color-disabled {
+      --mdc-button-disabled-ink-color: #{$color-disabled};
+    }
+    $ripple-config: theme.deep-get($theme, contained ripple);
+    @if $ripple-config {
+      @include ripple-theme.theme($ripple-config);
+    }
+  }
+}

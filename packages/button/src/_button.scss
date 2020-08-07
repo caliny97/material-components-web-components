@@ -1,0 +1,247 @@
+/**
+@license
+Copyright 2020 Google Inc. All Rights Reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+@use 'sass:math';
+@use 'sass:map';
+@use '@material/button/mixins' as button-mixins;
+@use '@material/button/variables' as button-variables;
+@use '@material/elevation/elevation-theme';
+@use '@material/theme/theme-color';
+@use '@material/theme/custom-properties';
+@use '@material/theme/theme';
+@use '@material/mwc-ripple/src/ripple-theme';
+@use './button-theme';
+
+@mixin horizontal-padding($padding) {
+  @include theme.property(padding-left, $padding);
+  @include theme.property(padding-right, $padding);
+}
+
+@mixin outline-width(
+  $outline-width,
+  $padding: button-variables.$contained-horizontal-padding
+) {
+  @include theme.property(border-width, $outline-width);
+
+  $replace: (
+    padding: $padding,
+    outline: $outline-width,
+  );
+
+  @include theme.property(
+    padding-left,
+    calc(padding - outline),
+    $replace: $replace
+  );
+
+  @include theme.property(
+    padding-right,
+    calc(padding - outline),
+    $replace: $replace
+  );
+}
+
+@mixin outlined-ripple($width) {
+  $replace: (
+    width: $width,
+  );
+
+  @include theme.property(top, calc(-1 * width), $replace: $replace);
+
+  @include theme.property(left, calc(-1 * width), $replace: $replace);
+
+  @include theme.property(border-width, $width);
+  border-style: solid;
+  border-color: transparent;
+}
+
+@mixin core-styles() {
+  @include button-mixins.without-ripple();
+
+  :host {
+    display: inline-flex;
+    outline: none;
+    /**
+     * Override vertical-align with shortest value "top". Vertical-align's default
+     * "baseline" value causes buttons to be misaligned next to each other if one
+     * button has an icon and the other does not.
+     */
+    vertical-align: top;
+  }
+
+  :host([disabled]) {
+    pointer-events: none;
+  }
+
+  :host([fullwidth]) {
+    width: 100%;
+  }
+
+  :host([raised]),
+  :host([unelevated]) {
+    $ripple-config: theme.deep-get(button-theme.$light-theme, contained ripple);
+    @include ripple-theme.theme($ripple-config);
+  }
+
+  .trailing-icon,
+  .leading-icon {
+    ::slotted(*),
+    .mdc-button__icon {
+      @include button-mixins.icon_();
+    }
+  }
+
+  .trailing-icon {
+    ::slotted(*),
+    .mdc-button__icon {
+      @include button-mixins.icon-trailing_();
+    }
+  }
+
+  .mdc-button {
+    flex: auto;
+    overflow: hidden;
+
+    $text-padding: custom-properties.create(
+      --mdc-button-horizontal-padding,
+      button-variables.$horizontal-padding
+    );
+
+    $contained-padding: custom-properties.set-fallback(
+      $text-padding,
+      button-variables.$contained-horizontal-padding
+    );
+
+    @include horizontal-padding($text-padding);
+
+    &.mdc-button--raised {
+      @include theme.property(
+        box-shadow,
+        custom-properties.create(
+          --mdc-button-raised-box-shadow,
+          elevation-theme.elevation-box-shadow(2)
+        )
+      );
+
+      &:hover,
+      &:focus {
+        @include theme.property(
+          box-shadow,
+          custom-properties.create(
+            --mdc-button-raised-box-shadow-hover,
+            elevation-theme.elevation-box-shadow(4)
+          )
+        );
+      }
+
+      &:active {
+        @include theme.property(
+          box-shadow,
+          custom-properties.create(
+            --mdc-button-raised-box-shadow-active,
+            elevation-theme.elevation-box-shadow(8)
+          )
+        );
+      }
+
+      &:disabled {
+        @include theme.property(
+          box-shadow,
+          custom-properties.create(
+            --mdc-button-raised-box-shadow-disabled,
+            elevation-theme.elevation-box-shadow(0)
+          )
+        );
+      }
+    }
+
+    &.mdc-button--raised,
+    &.mdc-button--unelevated {
+      @include horizontal-padding($padding: $contained-padding);
+    }
+
+    &.mdc-button--outlined {
+      $outline-width: custom-properties.create(
+        --mdc-button-outline-width,
+        button-variables.$outlined-border-width
+      );
+
+      @include outline-width(
+        $outline-width: $outline-width,
+        $padding: $contained-padding
+      );
+
+      @include theme.property(
+        border-color,
+        custom-properties.create(
+          --mdc-button-outline-color,
+          theme-color.prop-value(primary)
+        )
+      );
+
+      mwc-ripple {
+        @include outlined-ripple($width: $outline-width);
+      }
+    }
+
+    &.mdc-button--dense {
+      @include button-mixins.density(-2);
+    }
+  }
+
+  :host([disabled]) {
+    .mdc-button {
+      &.mdc-button--raised,
+      &.mdc-button--unelevated {
+        @include theme.property(
+          background-color,
+          custom-properties.create(
+            --mdc-button-disabled-fill-color,
+            button-variables.$outline-color
+          )
+        );
+        @include theme.property(
+          color,
+          custom-properties.create(
+            --mdc-button-disabled-ink-color,
+            button-variables.$disabled-ink-color
+          )
+        );
+      }
+
+      &:not(.mdc-button--raised):not(.mdc-button--unelevated) {
+        @include theme.property(
+          color,
+          custom-properties.create(
+            --mdc-button-disabled-ink-color,
+            button-variables.$disabled-ink-color
+          )
+        );
+      }
+
+      &.mdc-button--outlined {
+        @include theme.property(
+          border-color,
+          custom-properties.create(
+            --mdc-button-disabled-outline-color,
+              button-variables.$disabled-ink-color
+          )
+        );
+      }
+    }
+  }
+}
