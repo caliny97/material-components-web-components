@@ -1,0 +1,65 @@
+// NOTE: We disable `selector-class-pattern` above to allow using `mdc-` class
+// selectors.
+// stylelint-disable selector-class-pattern
+// Ignore function name case warnings from states module
+// stylelint-disable function-name-case
+
+@use 'sass:map';
+@use 'sass:string';
+@use 'javascript/materialdesign/webcomponents/ripple';
+@use '@material/theme/css';
+@use '@material/theme/theme-color';
+@use '@material/ripple/ripple-theme';
+@use '@material/theme/theme';
+@use '@material/checkbox/variables' as checkbox-variables;
+
+$ripple-opacity: (
+  hover: map.get(ripple-theme.$dark-ink-opacities, hover),
+  focus: map.get(ripple-theme.$dark-ink-opacities, focus),
+  press: map.get(ripple-theme.$dark-ink-opacities, press),
+);
+
+$light-theme: (
+  checkmark-color: checkbox-variables.$mark-color,
+  container-checked-color: checkbox-variables.$baseline-theme-color,
+  container-checked-hover-color: null,
+  container-disabled-color: checkbox-variables.$disabled-color,
+  outline-color: checkbox-variables.$border-color,
+  outline-hover-color: null,
+  ripple-color: theme-color.prop-value(theme-color.$on-surface),
+  ripple-opacity: $ripple-opacity,
+);
+
+@mixin theme($theme: $light-theme) {
+  @include css.declaration(
+    --mdc-checkbox-ink-color,
+    map.get($theme, checkmark-color)
+  );
+  @include css.declaration(
+    --mdc-theme-secondary,
+    map.get($theme, container-checked-color)
+  );
+  @include css.declaration(
+    --m-checkbox-hover-checked-color,
+    map.get($theme, container-checked-hover-color)
+  );
+  @include css.declaration(
+    --mdc-checkbox-unchecked-color,
+    map.get($theme, outline-color)
+  );
+  @include css.declaration(
+    --mdc-checkbox-disabled-color,
+    map.get($theme, container-disabled-color)
+  );
+  @include css.declaration(
+    --m-checkbox-hover-unchecked-color,
+    map.get($theme, outline-hover-color)
+  );
+
+  @include ripple.theme(
+    (
+      state: map.get($theme, ripple-color),
+      opacity: map.get($theme, ripple-opacity),
+    )
+  );
+}
